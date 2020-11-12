@@ -64,12 +64,19 @@ function process_get(req, res) {
     switch (result.pathname) {
         case '/play-game': {
 
-            console.log(result.query)
+            // console.log(result.query)
 
             theApp.playTime = parseInt( result.query.time)
             theApp.endTime =  parseInt( result.query.end)
             theApp.tick = 0;
             theApp.FSM = 'play'
+
+            exec(`aplay www/uploads/start.wav`, function (err, stdout, stderr) {
+                if (err) throw err;
+                else {
+                    console.log(stdout);
+                }
+            });
 
             res.writeHead(200, header);
             res.end(JSON.stringify({
@@ -269,6 +276,13 @@ function main_loop() {
                 theApp.mp3_child_process = null;
                 theApp.FSM = 'ready'
                 theApp.tick = 0
+
+                exec(`aplay www/uploads/end.wav`, function (err, stdout, stderr) {
+                    if (err) throw err;
+                    else {
+                        console.log(stdout);
+                    }
+                });
             }
             break;
 

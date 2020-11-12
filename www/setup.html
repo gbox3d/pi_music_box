@@ -17,11 +17,42 @@
 
 <body>
 
-    <div  style="border: solid 1px black; margin-top: 5px;" id="uploader-ui">
+    <div style="margin-bottom: 16px;">
+        <button style="font-size: 8px;" id="home">home</button>
+    </div>
+
+    <div id="start-wav" style="border: solid 1px black; margin-top: 5px;">
+        시작안내음
+
+        <div class='status-text'></div>
 
         <form name="upload-file">
             <div style="height: 80px;">
-                <input type="file" name="file" multiple>
+                <input type="file" name="file" data-filename="start.wav">
+            </div>
+        </form>
+    </div>
+
+    <div id="end-wav" style="border: solid 1px black; margin-top: 5px;">
+        종료안내음
+
+        <div class='status-text'></div>
+
+        <form name="upload-file">
+            <div style="height: 80px;">
+                <input type="file" name="file" data-filename="end.wav">
+            </div>
+        </form>
+    </div>
+
+    <div id="ending-music" style="border: solid 1px black; margin-top: 5px;">
+        종료 효과음악
+
+        <div class='status-text'></div>
+
+        <form name="upload-file">
+            <div style="height: 80px;">
+                <input type="file" name="file" data-filename="ending.mp3">
             </div>
         </form>
     </div>
@@ -38,49 +69,17 @@
         }
 
 
-        async function _setup() {
-
-            theApp.baseurl = location.hostname
-            theApp.infoText = document.querySelector("#info-text")
-            console.log('setup complete')
-            console.log(theApp)
-
-        }
-        _setup()
-
-        async function play() {
-
-            console.log('start')
-
-            await new Promise((resolve,reject)=> { theApp.delayTimeerID= setTimeout(()=> resolve(),5000)})
-
-            let _ =  await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/play-mp3?file=www/uploads/ending.mp3`)).json()
-
-            console.log('ending')
-
-            await new Promise((resolve,reject)=> {theApp.delayTimeerID= setTimeout(()=> resolve(),5000)})
-
-            console.log('stop')
-            _ = await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/stop`)).json()
-            console.log(_)
-        }
-
-        function stop() {
-            clearTimeout(theApp.delayTimeerID)
-            await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/stop`)).json()
-        }
+        var _onUpload = (evt) => {
 
 
-        document.querySelector('form[name=upload-file]').addEventListener('change', (evt) => {
-
-            // console.log('submit', evt.target.files[0])
-
-            // document.querySelector('#uploader-ui').classList.add('hide')
-
-            for(let i=0;i<evt.target.files.length;i++) 
-            {
+            for (let i = 0; i < evt.target.files.length; i++) {
                 let _fileObj = evt.target.files[i]
                 console.log(`try upload ${_fileObj.name}`)
+                console.log(evt.target)
+
+                let _statusText = evt.target.parentNode.parentNode.parentNode.querySelector('.status-text')
+
+                _statusText.innerText = 'uploading...'
 
                 const reader = new FileReader();
                 reader.addEventListener('load', async (_) => {
@@ -95,34 +94,52 @@
                             method: 'POST',
                             body: reader.result,
                             headers: new Headers({
-                                // 'detector-header-data' : JSON.stringify({ fn: 'none', th: 0.5, dtf: 1 })
                                 'Content-Type': _fileObj.type,
-                                'Upload-Name': "ending.mp3",
+                                'Upload-Name': evt.target.dataset.filename,
                                 'file-size': _fileObj.size
                             }), // 이 부분은 따로 설정하고싶은 header가 있다면 넣으세요
                         }))).json();
 
                         console.log(_)
-
-
+                        _statusText.innerText = `upload ${_.result}`
                         document.querySelector('form[name=upload-file] input[name="file"]').value = ''
                         console.log(`upload ${_fileObj.name}...ok`)
 
                     } catch (error) {
                         console.log(error)
-                        // theApp.infoText.innerText = error
                     }
+
                 })
                 reader.readAsArrayBuffer(_fileObj);
-                
+
             }
 
-          
+
             // let _fileObj = evt.target.files[0];
 
-        })
+        }
 
-        
+
+        async function _setup() {
+
+            theApp.baseurl = location.hostname
+            theApp.infoText = document.querySelector("#info-text")
+            console.log('setup complete')
+            console.log(theApp)
+
+            document.querySelectorAll('form[name=upload-file]').forEach(element => {
+                element.addEventListener('change',_onUpload)
+                
+            });
+
+            document.querySelector('#home').addEventListener('click',()=> {location.href='./index.html'})
+
+        }
+        _setup()
+
+
+
+
     </script>
 
 </body>

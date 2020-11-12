@@ -57,6 +57,16 @@
             console.log('setup complete')
             console.log(theApp)
 
+            if(localStorage.getItem("start") == null) {
+                localStorage.setItem("start","30")
+                localStorage.setItem("end","20")
+            }
+            else {
+                document.querySelector('#time').value = localStorage.getItem("start")
+                document.querySelector('#ending').value = localStorage.getItem("end")
+
+            }
+
             let _ = await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/get-status`)).json()
 
             if (_.app.FSM != 'ready') {
@@ -74,6 +84,8 @@
                 stop()
             })
 
+            document.querySelector('#setup').addEventListener('click',()=> {location.href='./setup.html'})
+
         }
         _setup()
 
@@ -83,6 +95,9 @@
 
             let _time = parseInt(document.querySelector('#time').value)
             let _end = parseInt(document.querySelector('#ending').value)
+
+            localStorage.setItem("start",_time)
+            localStorage.setItem("end",_end)
 
             let _ = await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/play-game?time=${_time}&end=${_end}`)).json()
 
