@@ -20,7 +20,7 @@ var theApp = {
     version: '0.1.1',
     port: parseInt(process.argv[3]),
     upload_path: process.argv[2],
-    FSM: 'ready',
+    FSM: 'bootup',
     tick: 0
 };
 
@@ -248,6 +248,10 @@ function process_post(req, res) {
 
 function main_loop() {
     switch (theApp.FSM) {
+        case 'bootup':
+            spawn('mpg321', ['www/welcomeInfantry.mp3']);
+            theApp.FSM = 'ready'
+            break;
 
         case 'ready':
             break;
