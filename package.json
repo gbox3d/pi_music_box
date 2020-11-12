@@ -1,0 +1,24 @@
+{
+  "name": "pi_music_box",
+  "version": "1.0.0",
+  "description": "pi juke box",
+  "main": "index.js",
+  "scripts": {
+    "start" : "node index.js www/uploads/ 17370",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbox3d/pi_music_box.git"
+  },
+  "keywords": [
+    "music",
+    "box"
+  ],
+  "author": "gbox3d",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gbox3d/pi_music_box/issues"
+  },
+  "homepage": "https://github.com/gbox3d/pi_music_box#readme"
+}

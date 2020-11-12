@@ -1,0 +1,17 @@
+###
+GET http://localhost:17370/
+
+###
+GET http://localhost:17370/play-mp3?file=russian.mp3
+
+###
+GET http://localhost:17370/get-status
+
+###
+GET http://localhost:17370/play-game?time=20&end=15
+
+###
+GET http://localhost:17370/stop-game
+
+###
+GET http://localhost:17370/stop

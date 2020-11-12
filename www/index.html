@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title> The Music Box </title>
+
+    <style>
+        .hide {
+            display: none;
+        }
+
+        button {
+            font-size: 64px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div style="margin-bottom: 16px;">
+        <button style="font-size: 8px;" id="setup">setup</button>
+    </div>
+
+    <div id='ready'>
+        time : <input id='time' value=30> , ending time : <input id='ending' value=10>
+        <div style="margin: 8px;" >
+            <button id="start">Start</button>
+        </div>
+        
+    </div>
+
+    <div id='play' class="hide">
+        <h1 id='time'></h1>
+        <button id="stop">Stop</button>
+    </div>
+
+    <script>
+
+        var theApp = {
+            version: [1, 0, 0],
+            baseAddress: {
+                url: location.hostname,
+                port: 17370
+
+            }
+        }
+
+
+        async function _setup() {
+
+            theApp.baseurl = location.hostname
+            theApp.infoText = document.querySelector("#info-text")
+            console.log('setup complete')
+            console.log(theApp)
+
+            let _ = await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/get-status`)).json()
+
+            if (_.app.FSM != 'ready') {
+                document.querySelector('#ready').classList.add('hide')
+                document.querySelector('#play').classList.remove('hide')
+
+            }
+
+
+            document.querySelector('#start').addEventListener('click', () => {
+                play()
+            })
+
+            document.querySelector('#stop').addEventListener('click', () => {
+                stop()
+            })
+
+        }
+        _setup()
+
+        async function play() {
+
+            console.log('start')
+
+            let _time = parseInt(document.querySelector('#time').value)
+            let _end = parseInt(document.querySelector('#ending').value)
+
+            let _ = await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/play-game?time=${_time}&end=${_end}`)).json()
+
+            console.log(_)
+            document.querySelector('#ready').classList.add('hide')
+            document.querySelector('#play').classList.remove('hide')
+
+            
+        }
+
+        async function stop() {
+            clearTimeout(theApp.delayTimeerID)
+            let _ = await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/stop`)).json()
+            document.querySelector('#ready').classList.remove('hide')
+            document.querySelector('#play').classList.add('hide')
+        }
+
+        async function _loop() {
+            let _ = await (await fetch(`http://${theApp.baseAddress.url}:${theApp.baseAddress.port}/get-status`)).json()
+
+            // console.log(_.app.tick)
+
+            document.querySelector('#play #time').innerText = _.app.tick
+
+            if(_.app.FSM == 'ready') {
+                document.querySelector('#ready').classList.remove('hide')
+                document.querySelector('#play').classList.add('hide')
+            }
+
+            await new Promise((resolve, reject) => { theApp.delayTimeerID = setTimeout(() => resolve(), 1000) })
+            _loop()
+        }
+
+        _loop()
+
+
+
+    </script>
+
+</body>
+
+</html>
